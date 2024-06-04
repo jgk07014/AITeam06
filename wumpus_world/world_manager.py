@@ -84,14 +84,19 @@ class World():
         self.action = Actions(adj_start_point, init_direction)#초기 위치와 바라보고있는 방향 설정
         self.init_action = copy.deepcopy(self.action)#call by reference 가 아닌 call by value 를 활용해야하기 때문에 deepcopy 사용
         self.grid = None#맵
+        self.init_grid = None#초기맵
         self.is_game_over = None#게임이 끝났는지 여부
         self.is_collected_gold = None#금 획득 여부
 
-    def initialize(self):
+    def reset(self):
         # 상태 초기화
         self.is_game_over = False
         self.is_collected_gold = False
         self.action = copy.deepcopy(self.init_action)
+        self.grid = copy.deepcopy(self.init_grid)
+
+    def initialize(self):
+        self.reset()
 
         # 그리드 초기화
         self.grid = [[StateType.ground] * self.cols for _ in range(self.rows)]
@@ -120,6 +125,9 @@ class World():
             x, y = self.get_random_empty_location()
             self.grid[y][x] = StateType.gold
 
+        # grid 백업
+        self.init_grid = copy.deepcopy(self.grid)
+
     def get_random_empty_location(self):
         empty_locations = [(x, y) for y in range(0, self.rows) for x in range(0, self.cols)
                            if self.grid[y][x] == StateType.ground and (x, y) != self.start_point]
@@ -130,7 +138,7 @@ class World():
 
     #해당 액션이 가능하다면 적용, 불가능하다면 에러 발생
     def apply_action(self, action_type):
-        assert self.is_valid_action(action_type), "invalid action"
+        assert self.is_valid_action(action_type), "invalid action is " + str(action_type)
         new_action = None
         percept_list = set()
 
@@ -160,7 +168,7 @@ class World():
             new_action = Actions.shoot_arrow(self.action)
             arrow_point = Actions.move_forward(new_action).point
             #화살이 진행한 방향에 wumpus가 존재할 경우 wumpus 제거 및 scream 발생
-            if self.is_valid_coordinate(arrow_point) and self.get_state_type_on_point(arrow_point):
+            if self.is_valid_coordinate(arrow_point) and self.get_state_type_on_point(arrow_point) == StateType.wumpus:
                 self.grid[arrow_point.row][arrow_point.col] = StateType.ground
                 percept_list.add(PerceptType.scream)
         elif ActionType.climb == action_type:
