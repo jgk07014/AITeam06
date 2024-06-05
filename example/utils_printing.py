@@ -1,5 +1,5 @@
 from wumpus_world.utils import Point
-from wumpus_world.type_definitions import StateType, ActionType, DirectionType
+from wumpus_world.type_definitions import StateType, ActionType, DirectionType, PerceptType
 
 STATE_TO_CHAR = {
     #StateType.unknown   : '땅',
@@ -71,3 +71,13 @@ def print_result(world, analysis_data):
     else:
         print("패배...")
     print("총 행동 횟수 : " + str(total_action_count))
+
+def print_percept_map(wumpus_world, QLearingAgent):
+    curr_location = wumpus_world.action.point
+    percepts = QLearingAgent.percept_map[curr_location.row][curr_location.col]
+
+    if percepts is None or len(percepts) == 0:
+        percept_str = "None"
+    else:
+        percept_str = ', '.join([PerceptType(percept).name for percept in percepts])
+    print("현재 위치에서 느끼는 감각 : " + percept_str)

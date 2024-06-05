@@ -1,7 +1,7 @@
 import agents, time
 from wumpus_world.world_manager import World
 from wumpus_world.config import WorldConfig
-from example.utils_printing import print_board, print_action, print_result
+from example.utils_printing import print_board, print_action, print_result, print_percept_map
 from wumpus_world.type_definitions import ActionType
 
 DELAY_TIME = 1 # 초단위, 출력 지연 시간 설정
@@ -33,7 +33,7 @@ def test_q_learing_bot():
                          WorldConfig.ARROW_COUNT, WorldConfig.WUMPUS_COUNT, WorldConfig.PIT_COUNT,
                          WorldConfig.GOLD_COUNT)
     wumpus_world.initialize()
-    q_agent = agents.QLearingAgent()
+    q_agent = agents.QLearingAgent(wumpus_world, 0.1, 0.99, 0.1)
 
     # 에이전트 학습
     episodes = 10000 # 총 학습 횟수
@@ -49,7 +49,9 @@ def test_q_learing_bot():
             q_agent.learn(state, action, reward, next_state)
             state = next_state
             total_reward += reward
-            wumpus_world.apply_action(action)
+            percept_list = wumpus_world.apply_action(action)
+            # percept_list = wumpus_world.get_percept_type_list_on_point(wumpus_world.action.point) # scream 에서 버그 발생하므로 apply_action 에서 가져와야함
+            q_agent.update_percept_map(percept_list, wumpus_world.action.point)
 
         if episode % 1000 == 0:
             print(f"Episode {episode}: Total Reward: {total_reward}")
@@ -69,7 +71,10 @@ def test_q_learing_bot():
 
         analysis_data['total_action_count'] += 1
         print_action(action_type, analysis_data)
-        wumpus_world.apply_action(action_type)
+        print_percept_map(wumpus_world, q_agent)
+        percept_list = wumpus_world.apply_action(action_type)
+        # percept_list = wumpus_world.get_percept_type_list_on_point(wumpus_world.action.point) # scream 에서 버그 발생하므로 apply_action 에서 가져와야함
+        q_agent.update_percept_map(percept_list, wumpus_world.action.point)
 
     print_result(wumpus_world, analysis_data)
 
