@@ -177,6 +177,8 @@ class World():
             if self.is_collected_gold and new_action.point == self.start_point:
                 self.is_game_over = True
 
+        # 버그 수정 : 모든 행위에 대해서 percept_list 업데이트 할 것.
+        percept_list.update(self.get_percept_type_list_on_point(new_action.point))
         self.action = new_action
 
         return list(percept_list)
