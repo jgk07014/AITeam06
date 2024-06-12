@@ -1,3 +1,9 @@
+import sys
+import os
+
+# 현재 파일 경로를 기준으로 루트 디렉토리를 경로에 추가합니다.
+sys.path.append(os.path.abspath(os.path.join(os.path.dirname(__file__), '../')))
+
 import agents, time
 from wumpus_world.world_manager import World
 from wumpus_world.config import WorldConfig
