@@ -39,7 +39,7 @@ def test_q_learing_bot():
                          WorldConfig.ARROW_COUNT, WorldConfig.WUMPUS_COUNT, WorldConfig.PIT_COUNT,
                          WorldConfig.GOLD_COUNT)
     wumpus_world.initialize()
-    q_agent = agents.QLearingAgent(wumpus_world, 0.1, 0.99, 0.1)
+    q_agent = agents.QLearingAgent(wumpus_world, 0.01, 0.99, 0.1)
 
     # 에이전트 학습
     episodes = 10000 # 총 학습 횟수
